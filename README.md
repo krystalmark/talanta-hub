@@ -1,6 +1,6 @@
-# 🎟️ Ticko — Full Stack Events Platform
+# 🌟 TalantaHub — Full Stack Events & Talent Platform
 
-A modern full-stack web application to browse and manage events.
+TalantaHub is a modern full-stack web platform designed to showcase and manage events, talent, and community activities.
 
 ### 🧱 Tech Stack
 - **Frontend**: React, Vite, TypeScript, Tailwind CSS, React Query, React Router
