@@ -4,11 +4,14 @@ import "aos/dist/aos.css";
 import { FaLinkedin, FaTwitter, FaGithub } from "react-icons/fa";
 
 const backgroundImages = [
-  "/images/a935aeba-56f3-4c9b-bbd1-978e446cba10.jpg",
-  "/images/Beautiful Africa.jpg",
-  "/images/Emotional Black Boy Art - Violin Tears Digital Print, Soulful African Children Wall Decor.jpg",
-   "/images/Unleashing Determination! 🏀💪.jpg",
-   "/images/Vibrant, expressive portrait of joyful, mischievous siblings_.jpg",
+  "public/images/picture2 .jpg",
+  "public/images/picture3.jpg",
+  "public/images/picture4.jpg",
+  "public/images/picture5.jpg",
+  "public/images/picture6.jpg",
+  "public/images/picture7.jpg",
+  "public/images/picture8.jpg"
+   
 ];
 
 
@@ -89,7 +92,7 @@ export default function Home() {
       </div>
 
       <section className="relative min-h-screen z-10 flex flex-col justify-center items-center text-center px-4 py-12 text-white" data-aos="fade-up">
-        <h1 className="text-5xl font-extrabold mb-6">TalantaHub Kenya</h1>
+        <h1 className="text-5xl font-extrabold mb-6">Welcome to TalantaHub Kenya</h1>
         <p className="text-xl max-w-3xl mb-4">
           TalantaHub Kenya is a digital platform designed to empower Kenyan youth by showcasing their diverse talents and connecting them with real opportunities.
         </p>
@@ -140,6 +143,44 @@ export default function Home() {
         </div>
         <p className="text-center text-sm text-gray-600 mt-10">© {new Date().getFullYear()} TalantaHub Kenya. All rights reserved.</p>
       </section>
+     {/* ---------- Reach‑Out Section ---------- */}
+<section className="mt-16 bg-white rounded-lg shadow p-8 max-w-4xl mx-auto text-center">
+  <h2 className="text-3xl font-bold text-gray-800 mb-4">Reach Out to TalantaHub</h2>
+
+  {/* TikTok */}
+  <div className="flex flex-col items-center gap-2 mb-6">
+    <span className="text-lg text-gray-700 font-medium">Follow us on TikTok</span>
+    <a
+      href="http://tiktok.com/@talanta_hub"         // replace with your handle
+      target="_blank"
+      rel="noopener noreferrer"
+      className="inline-flex items-center gap-2 bg-black text-white px-6 py-3 rounded-full hover:bg-gray-900 transition"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        className="h-6 w-6"
+        viewBox="0 0 24 24"
+        fill="currentColor"
+      >
+        <path d="M9.75 2.5v12.75a2.75 2.75 0 1 1-2.75-2.75" />
+        <path d="M9.75 5.75A4 4 0 0 0 13.75 9.75H15a4 4 0 0 1 4 4v.25" />
+      </svg>
+      @talantahub
+    </a>
+  </div>
+
+  {/* Email */}
+  <div className="flex flex-col items-center gap-2">
+    <span className="text-lg text-gray-700 font-medium">Email us</span>
+    <a
+      href="mailto:hello@talantahub.com"
+      className="inline-block bg-indigo-600 text-white px-6 py-3 rounded-full hover:bg-indigo-700 transition"
+    >
+      hello@talantahub.com
+    </a>
+  </div>
+</section>
+ 
     </div>
   );
 }

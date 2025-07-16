@@ -1,33 +1,66 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Discover from './pages/Discover';
-import Opportunities from './pages/Opportunities';
 import Upload from './pages/Upload';
-import Login from './pages/Login';
 import Signup from './pages/Signup';
+import Login from './pages/Login';
+import PrivateRoute from './components/PrivateRoute';
+import Opportunities from './pages/Opportunities';
+import PostOpportunity from './pages/Opportunities/PostForm';
+import ManageDashboard from './pages/Opportunities/ManageDashboard';
 import { AuthProvider } from './contexts/AuthContext';
 import { TalentProvider } from './contexts/TalentContext';
-import PrivateRoute from './components/PrivateRoute';
+import { OpportunitiesProvider } from './contexts/OpportunitiesContext';
+import ViewAll from './pages/Opportunities/ViewAll';
 
-function App() {
+export default function App() {
   return (
-    <Router>
-      <AuthProvider>
-        <TalentProvider>
+    <AuthProvider>
+      <TalentProvider>
+        <OpportunitiesProvider>
           <Navbar />
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/upload" element={<PrivateRoute><Upload /></PrivateRoute>} />
-            <Route path="/opportunities" element={<PrivateRoute><Opportunities /></PrivateRoute>} />
-            <Route path="/discover" element={<PrivateRoute><Discover /></PrivateRoute>} />
+            <Route path="/discover" element={<Discover />} />
+            <Route path="/opportunities/all" element={<ViewAll />} />
+            <Route
+              path="/upload"
+              element={
+                <PrivateRoute>
+                  <Upload />
+                </PrivateRoute>
+              }
+            />
+
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
+
+            {/* Public view of all opportunities */}
+            <Route path="/opportunities" element={<Opportunities />} />
+
+            {/* Private opportunity submission route */}
+            <Route
+              path="/opportunities/post"
+              element={
+                <PrivateRoute allowedRoles={['mentor', 'sponsor', 'organization']}>
+                  <PostOpportunity />
+                </PrivateRoute>
+              }
+            />
+
+            {/* View all submissions by logged-in orgs/mentors */}
+            <Route
+              path="/opportunities/dashboard"
+              element={
+                <PrivateRoute allowedRoles={['mentor', 'sponsor', 'organization']}>
+                  <ManageDashboard />
+                </PrivateRoute>
+              }
+            />
           </Routes>
-        </TalentProvider>
-      </AuthProvider>
-    </Router>
+        </OpportunitiesProvider>
+      </TalentProvider>
+    </AuthProvider>
   );
 }
-
-export default App;

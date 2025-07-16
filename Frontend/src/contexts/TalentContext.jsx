@@ -1,20 +1,30 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 
+/* ------------------------------------------------------------------ */
+/*  TalentContext – provides global talent list + helper to add       */
+/* ------------------------------------------------------------------ */
 const TalentContext = createContext();
 
 export function TalentProvider({ children }) {
+  /* ---------- 1. 100 % EMPTY at start -------------- */
   const [talents, setTalents] = useState([]);
 
-  const addTalent = (talent) => {
-    setTalents(prev => [...prev, talent]);
-  };
+  /* ---------- 2. OPTIONAL localStorage persistence-- */
+  useEffect(() => {
+    const saved = JSON.parse(localStorage.getItem('talantahub_talents') || '[]');
+    if (saved.length) setTalents(saved);
+  }, []);
 
-  const deleteTalent = (index) => {
-    setTalents(prev => prev.filter((_, i) => i !== index));
-  };
+  useEffect(() => {
+    localStorage.setItem('talantahub_talents', JSON.stringify(talents));
+  }, [talents]);
+
+  /* ---------- 3. helper to add new talent ---------- */
+  const addTalent = (talentObj) =>
+    setTalents((prev) => [{ id: Date.now(), ...talentObj }, ...prev]);
 
   return (
-    <TalentContext.Provider value={{ talents, addTalent, deleteTalent }}>
+    <TalentContext.Provider value={{ talents, addTalent }}>
       {children}
     </TalentContext.Provider>
   );

@@ -1,108 +1,190 @@
-// Opportunities.jsx
+import { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { Navigate } from 'react-router-dom';
+import { useOpportunities } from '../contexts/OpportunitiesContext';
+import AOS from 'aos';
+import 'aos/dist/aos.css';
+import { Link } from 'react-router-dom';
 
 export default function Opportunities() {
-  const { users, user, setUsers } = useAuth();
+  const { user } = useAuth();
+  const role = user?.role?.toLowerCase() ?? 'guest';
+  const { addOpportunity } = useOpportunities();
 
-  if (!user) return <Navigate to="/login" />;
+  const [formData, setFormData] = useState({
+    title: '',
+    description: '',
+    contact: '',
+    organization: '',
+    photoFile: null,
+    photoURL: ''
+  });
 
-  const handleDelete = (emailToDelete) => {
-    const updatedUsers = users.map(u => {
-      if (u.email === emailToDelete) {
-        return { ...u, opportunity: '' };
-      }
-      return u;
-    });
-    setUsers(updatedUsers);
+  const canPost = ['mentor', 'sponsor', 'organization'].includes(role);
+
+  useEffect(() => {
+    AOS.init({ duration: 800 });
+  }, []);
+
+  const handleChange = (e) =>
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+
+  const handlePhoto = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    setFormData((prev) => ({ ...prev, photoFile: file, photoURL: url }));
   };
 
-  const opportunities = users.filter(
-    (u) => u.opportunity && (u.role === 'Mentor' || u.role === 'Sponsor' || u.role === 'Organization')
-  );
+  const resetForm = () =>
+    setFormData({
+      title: '',
+      description: '',
+      contact: '',
+      organization: '',
+      photoFile: null,
+      photoURL: ''
+    });
 
-  const youths = users.filter((u) => u.role === 'Youth');
+  const submitOpportunity = (e) => {
+    e.preventDefault();
+    const { title, description, contact, organization, photoURL } = formData;
+    if (!title || !description || !contact) return;
+
+    const newOpp = {
+      id: Date.now(),
+      title,
+      description,
+      contact,
+      organization:
+        role === 'organization' ? (organization || user?.name || '') : '',
+      photo: photoURL || null,
+      postedBy: user?.name || 'Unknown',
+      role
+    };
+
+    addOpportunity(newOpp);
+    resetForm();
+    alert('Opportunity posted! You can view it in your dashboard.');
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-700 to-pink-500 py-12 px-6">
-      <h2 className="text-4xl font-extrabold text-center text-white mb-10">🎯 Available Opportunities</h2>
-
-      {opportunities.length === 0 ? (
-        <p className="text-white text-center text-xl">No opportunities available at the moment.</p>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {opportunities.map((oppUser, index) => (
-            <div
-              key={index}
-              className="bg-white p-6 rounded-xl shadow-lg hover:shadow-2xl transform hover:-translate-y-1 transition duration-300 relative"
-            >
-              <img
-                src={`https://source.unsplash.com/400x200/?${oppUser.role},youth`}
-                alt={`${oppUser.role}`}
-                className="w-full h-40 object-cover rounded-lg mb-4"
-              />
-
-              <h3 className="text-2xl font-bold text-indigo-700 mb-1">{oppUser.name}</h3>
-              <p className="text-sm text-pink-600 font-semibold mb-2">
-                {oppUser.role} Opportunity
-              </p>
-
-              <div className="flex flex-wrap gap-2 mb-3">
-                <span className="bg-indigo-100 text-indigo-700 text-xs px-2 py-1 rounded-full font-medium">
-                  {oppUser.role}
-                </span>
-                <span className="bg-pink-100 text-pink-700 text-xs px-2 py-1 rounded-full font-medium">
-                  Youth Empowerment
-                </span>
-              </div>
-
-              <p className="text-gray-800 mb-4 text-sm">{oppUser.opportunity}</p>
-
-              <p className="text-sm text-gray-600 mb-2">
-                <strong>Email:</strong> <a href={`mailto:${oppUser.email}`} className="text-indigo-600 underline">{oppUser.email}</a>
-              </p>
-
-              {user && user.role === 'Youth' && (
-                <a
-                  href={`mailto:${oppUser.email}`}
-                  className="block w-full text-center bg-indigo-600 hover:bg-indigo-800 text-white py-2 rounded-full font-semibold shadow mb-3"
-                >
-                  📩 Contact {oppUser.role}
-                </a>
-              )}
-
-              {user && (user.role === 'Mentor' || user.role === 'Sponsor' || user.role === 'Organization') && (
-                <div className="mt-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Reach Out to Youths:</label>
-                  <select
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white"
-                    onChange={(e) => {
-                      const email = e.target.value;
-                      if (email) window.location.href = `mailto:${email}`;
-                    }}
-                  >
-                    <option value="">Select a Youth to Contact</option>
-                    {youths.map((youth, idx) => (
-                      <option key={idx} value={youth.email}>
-                        {youth.name} ({youth.email})
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              )}
-
-              {user && user.email === oppUser.email && (
-                <button
-                  onClick={() => handleDelete(oppUser.email)}
-                  className="absolute top-3 right-3 bg-red-500 hover:bg-red-700 text-white px-3 py-1 text-sm rounded-full shadow"
-                >
-                  🗑️ Delete
-                </button>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
+    <main className="min-h-screen px-4 py-10 bg-gradient-to-b from-[#10D164] to-[#009245] text-white">
+      <div className="max-w-5xl mx-auto">
+        <h1 className="text-4xl font-bold text-center mb-8" data-aos="fade-down">
+          Opportunities
+        </h1>
+{user && role === 'youth' && (
+  <>
+    <div className="mb-8" data-aos="fade-right">
+      <div className="bg-yellow-100 text-yellow-800 p-4 rounded shadow mb-4 text-center">
+        You’re logged in as a <strong>Youth</strong>. You can’t post opportunities,
+        but you can browse those shared by mentors, sponsors, and organizations.
+      </div>
+      <div className="text-center">
+        <Link
+          to="/opportunities/all"
+          className="inline-block bg-green-600 text-white hover:bg-green-700 px-5 py-2 rounded-md font-semibold transition"
+        >
+          View Opportunities →
+        </Link>
+      </div>
     </div>
+  </>
+)}
+
+        {!user && (
+          <div className="mb-8 bg-red-100 text-red-800 p-4 rounded shadow" data-aos="fade-right">
+            Please <a href="/login" className="underline font-semibold">log in</a> to post or view opportunities.
+          </div>
+        )}
+
+        {canPost && (
+          <>
+            <form
+              onSubmit={submitOpportunity}
+              className="bg-white text-black p-6 rounded-xl shadow-lg mb-10"
+              data-aos="zoom-in"
+            >
+              <h2 className="text-2xl font-semibold mb-4">Submit an Opportunity</h2>
+
+              <div className="grid md:grid-cols-2 gap-4">
+                <input
+                  name="title"
+                  value={formData.title}
+                  onChange={handleChange}
+                  placeholder="Opportunity Title"
+                  className="p-3 border rounded"
+                  required
+                />
+
+                <input
+                  name="contact"
+                  value={formData.contact}
+                  onChange={handleChange}
+                  placeholder="Contact (email / phone / link)"
+                  className="p-3 border rounded"
+                  required
+                />
+
+                {role === 'organization' && (
+                  <input
+                    name="organization"
+                    value={formData.organization}
+                    onChange={handleChange}
+                    placeholder="Organization Name"
+                    className="p-3 border rounded md:col-span-2"
+                    required
+                  />
+                )}
+
+                <textarea
+                  name="description"
+                  value={formData.description}
+                  onChange={handleChange}
+                  placeholder="Opportunity Description"
+                  rows={4}
+                  className="p-3 border rounded md:col-span-2"
+                  required
+                />
+
+                <div className="md:col-span-2 flex items-center gap-4">
+                  <label className="font-medium shrink-0">Logo / Image:</label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handlePhoto}
+                    className="block w-full text-sm"
+                  />
+                </div>
+
+                {formData.photoURL && (
+                  <img
+                    src={formData.photoURL}
+                    alt="preview"
+                    className="md:col-span-2 h-28 w-28 object-cover rounded-full border"
+                  />
+                )}
+
+                <button
+                  type="submit"
+                  className="md:col-span-2 bg-green-600 text-white py-2 rounded hover:bg-green-700 transition"
+                >
+                  Post Opportunity
+                </button>
+              </div>
+            </form>
+
+            <div className="text-center">
+              <Link
+                to="/opportunities/dashboard"
+                className="inline-block bg-indigo-600 text-white px-6 py-3 rounded font-semibold hover:bg-indigo-700"
+              >
+                View My Submitted Opportunities →
+              </Link>
+            </div>
+          </>
+        )}
+      </div>
+    </main>
   );
 }

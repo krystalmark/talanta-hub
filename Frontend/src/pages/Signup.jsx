@@ -1,88 +1,120 @@
-import { useState } from 'react';
-import { useAuth } from '../contexts/AuthContext';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function Signup() {
-  const { signup } = useAuth();
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [role, setRole] = useState('Youth');
-  const [opportunity, setOpportunity] = useState('');
-  const [error, setError] = useState('');
+  const { user, signup } = useAuth();
   const navigate = useNavigate();
+
+  /* redirect if already logged‑in */
+  useEffect(() => {
+    if (user) navigate('/');
+  }, [user, navigate]);
+
+  const [form, setForm] = useState({
+    username: '',
+    email: '',
+    password: '',
+    role: 'youth',
+    opportunityInfo: '',
+  });
+  const [error, setError] = useState('');
+
+  const handleChange = (e) =>
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const success = signup(name, email, password, role, opportunity);
-    if (!success) {
-      setError('⚠️ User already exists.');
-    } else {
-      navigate('/login');
-    }
+    const ok = signup(form);
+    if (!ok) return setError('Signup failed – try different credentials.');
+    navigate('/');
+    // after if (ok) navigate('/'); etc.
+localStorage.setItem('lastSignupEmail', form.email.trim().toLowerCase());
+
   };
 
+  const isOpportunityProvider = ['mentor', 'sponsor', 'organization'].includes(
+    form.role
+  );
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-500 to-indigo-600 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 bg-white shadow-xl rounded-xl p-10">
-        <div>
-          <h2 className="text-center text-3xl font-extrabold text-gray-900">📝 Create Your TalantaHub Account</h2>
-        </div>
-        {error && <p className="text-red-500 text-center">{error}</p>}
-        <form className="mt-8 space-y-4" onSubmit={handleSubmit}>
+    <main className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#10D164] to-[#009245] px-4">
+      <form
+        onSubmit={handleSubmit}
+        className="w-full max-w-md bg-white p-8 rounded-xl shadow-xl"
+      >
+        <h1 className="text-2xl font-bold mb-6 text-center">Create Account</h1>
+
+        {error && <p className="mb-4 text-red-600">{error}</p>}
+
+        <div className="space-y-4">
           <input
             type="text"
+            name="username"
+            placeholder="Username"
             required
-            placeholder="🙋 Full Name"
-            className="w-full px-4 py-2 border rounded-lg shadow-sm focus:ring-pink-500 focus:border-pink-500"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            value={form.username}
+            onChange={handleChange}
+            className="w-full p-3 border rounded"
           />
           <input
             type="email"
+            name="email"
+            placeholder="Email"
             required
-            placeholder="📧 Email address"
-            className="w-full px-4 py-2 border rounded-lg shadow-sm focus:ring-pink-500 focus:border-pink-500"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={form.email}
+            onChange={handleChange}
+            className="w-full p-3 border rounded"
           />
           <input
             type="password"
+            name="password"
+            placeholder="Password"
             required
-            placeholder="🔑 Password"
-            className="w-full px-4 py-2 border rounded-lg shadow-sm focus:ring-pink-500 focus:border-pink-500"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            value={form.password}
+            onChange={handleChange}
+            className="w-full p-3 border rounded"
           />
 
+          <label className="block font-semibold">Register as:</label>
           <select
-            className="w-full px-4 py-2 border rounded-lg shadow-sm bg-white focus:ring-pink-500 focus:border-pink-500"
-            value={role}
-            onChange={(e) => setRole(e.target.value)}
+            name="role"
+            value={form.role}
+            onChange={handleChange}
+            className="w-full p-3 border rounded"
           >
-            <option value="Youth">Youth</option>
-            <option value="Mentor">Mentor</option>
-            <option value="Sponsor">Sponsor</option>
-            <option value="Organization">Organization</option>
+            <option value="youth">Youth</option>
+            <option value="mentor">Mentor</option>
+            <option value="sponsor">Sponsor</option>
+            <option value="organization">Organization</option>
           </select>
 
-          {(role === 'Mentor' || role === 'Sponsor' || role === 'Organization') && (
+          {isOpportunityProvider && (
             <textarea
-              placeholder="💡 Describe your opportunity for youths..."
-              className="w-full px-4 py-2 border rounded-lg shadow-sm focus:ring-pink-500 focus:border-pink-500"
-              value={opportunity}
-              onChange={(e) => setOpportunity(e.target.value)}
+              name="opportunityInfo"
+              rows={4}
+              placeholder="Describe the opportunities you provide (optional)"
+              value={form.opportunityInfo}
+              onChange={handleChange}
+              className="w-full p-3 border rounded"
             />
           )}
 
           <button
             type="submit"
-            className="w-full bg-pink-600 hover:bg-pink-800 text-white py-2 rounded-lg font-semibold shadow-lg transition duration-300"
+            className="w-full bg-green-600 text-white py-3 rounded hover:bg-green-700 transition"
           >
-            🌟 Sign Up
+            Sign Up
           </button>
-        </form>
-      </div>
-    </div>
+        </div>
+
+        <p className="mt-6 text-sm text-center">
+          Already signed up?{' '}
+          <a href="/login" className="text-green-700 hover:underline">
+            Log in here
+          </a>
+        </p>
+      </form>
+    </main>
   );
 }
