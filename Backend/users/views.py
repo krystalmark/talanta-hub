@@ -1,26 +1,23 @@
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import UserProfile
-from .serializers import UserProfileSerializer
+from rest_framework import status
+from rest_framework.authtoken.models import Token
+from .serializers import UserSignupSerializer, UserLoginSerializer
 
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def get_all_users(request):
-    profiles = UserProfile.objects.select_related('user').all()
-    serialized = UserProfileSerializer(profiles, many=True)
-    return Response(serialized.data)
+class SignupView(APIView):
+    def post(self, request):
+        serializer = UserSignupSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            token, _ = Token.objects.get_or_create(user=user)
+            return Response({'token': token.key}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(['PUT'])
-@permission_classes([IsAuthenticated])
-def clear_opportunity(request, user_id):
-    try:
-        profile = UserProfile.objects.get(user__id=user_id)
-        if profile.user != request.user:
-            return Response({'error': 'Unauthorized'}, status=403)
-        profile.opportunity = ''
-        profile.save()
-        return Response({'success': True})
-    except UserProfile.DoesNotExist:
-        return Response({'error': 'User not found'}, status=404)
-
+class LoginView(APIView):
+    def post(self, request):
+        serializer = UserLoginSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.validated_data['user']
+            token, _ = Token.objects.get_or_create(user=user)
+            return Response({'token': token.key}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

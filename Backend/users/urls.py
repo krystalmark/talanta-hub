@@ -1,7 +1,8 @@
+# users/urls.py
 from django.urls import path
-from .views import get_all_users, clear_opportunity
+from .views import SignupView, LoginView
 
 urlpatterns = [
-    path('users/', get_all_users),
-    path('users/<int:user_id>/remove-opportunity/', clear_opportunity),
+    path('signup/', SignupView.as_view(), name='signup'),
+    path('login/', LoginView.as_view(), name='login'),
 ]

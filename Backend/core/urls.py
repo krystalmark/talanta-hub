@@ -1,8 +1,7 @@
-from django.urls import path
-from .views import signup_view, login_view
+from django.contrib import admin
+from django.urls import path, include
 
 urlpatterns = [
-    path('signup/', signup_view),
-    path('login/', login_view),
-     path('upload-talent/', upload_talent),
+    path('admin/', admin.site.urls),
+    path('api/', include('users.urls')),
 ]

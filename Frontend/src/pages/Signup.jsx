@@ -6,7 +6,6 @@ export default function Signup() {
   const { user, signup } = useAuth();
   const navigate = useNavigate();
 
-  /* redirect if already logged‑in */
   useEffect(() => {
     if (user) navigate('/');
   }, [user, navigate]);
@@ -16,104 +15,36 @@ export default function Signup() {
     email: '',
     password: '',
     role: 'youth',
-    opportunityInfo: '',
   });
   const [error, setError] = useState('');
 
-  const handleChange = (e) =>
+  const handleChange = (e) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const ok = signup(form);
-    if (!ok) return setError('Signup failed – try different credentials.');
-    navigate('/');
-    // after if (ok) navigate('/'); etc.
-localStorage.setItem('lastSignupEmail', form.email.trim().toLowerCase());
-
   };
 
-  const isOpportunityProvider = ['mentor', 'sponsor', 'organization'].includes(
-    form.role
-  );
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const ok = await signup(form);
+    if (!ok) return setError('Signup failed. Try different credentials.');
+    localStorage.setItem('lastSignupEmail', form.email.toLowerCase());
+    navigate('/');
+  };
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#10D164] to-[#009245] px-4">
-      <form
-        onSubmit={handleSubmit}
-        className="w-full max-w-md bg-white p-8 rounded-xl shadow-xl"
-      >
-        <h1 className="text-2xl font-bold mb-6 text-center">Create Account</h1>
-
-        {error && <p className="mb-4 text-red-600">{error}</p>}
-
-        <div className="space-y-4">
-          <input
-            type="text"
-            name="username"
-            placeholder="Username"
-            required
-            value={form.username}
-            onChange={handleChange}
-            className="w-full p-3 border rounded"
-          />
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            required
-            value={form.email}
-            onChange={handleChange}
-            className="w-full p-3 border rounded"
-          />
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            required
-            value={form.password}
-            onChange={handleChange}
-            className="w-full p-3 border rounded"
-          />
-
-          <label className="block font-semibold">Register as:</label>
-          <select
-            name="role"
-            value={form.role}
-            onChange={handleChange}
-            className="w-full p-3 border rounded"
-          >
-            <option value="youth">Youth</option>
-            <option value="mentor">Mentor</option>
-            <option value="sponsor">Sponsor</option>
-            <option value="organization">Organization</option>
-          </select>
-
-          {isOpportunityProvider && (
-            <textarea
-              name="opportunityInfo"
-              rows={4}
-              placeholder="Describe the opportunities you provide (optional)"
-              value={form.opportunityInfo}
-              onChange={handleChange}
-              className="w-full p-3 border rounded"
-            />
-          )}
-
-          <button
-            type="submit"
-            className="w-full bg-green-600 text-white py-3 rounded hover:bg-green-700 transition"
-          >
-            Sign Up
-          </button>
-        </div>
-
-        <p className="mt-6 text-sm text-center">
-          Already signed up?{' '}
-          <a href="/login" className="text-green-700 hover:underline">
-            Log in here
-          </a>
-        </p>
+    <main className="min-h-screen flex items-center justify-center bg-green-200 px-4">
+      <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow-md w-full max-w-md">
+        <h2 className="text-xl font-bold mb-4">Create Account</h2>
+        {error && <p className="text-red-600 mb-2">{error}</p>}
+        <input name="username" placeholder="Username" value={form.username} onChange={handleChange} required className="w-full p-2 mb-2 border" />
+        <input name="email" placeholder="Email" type="email" value={form.email} onChange={handleChange} required className="w-full p-2 mb-2 border" />
+        <input name="password" placeholder="Password" type="password" value={form.password} onChange={handleChange} required className="w-full p-2 mb-2 border" />
+        <select name="role" value={form.role} onChange={handleChange} className="w-full p-2 mb-4 border">
+          <option value="youth">Youth</option>
+          <option value="mentor">Mentor</option>
+          <option value="sponsor">Sponsor</option>
+          <option value="organization">Organization</option>
+        </select>
+        <button type="submit" className="w-full bg-green-600 text-white p-2 rounded">Sign Up</button>
       </form>
     </main>
   );

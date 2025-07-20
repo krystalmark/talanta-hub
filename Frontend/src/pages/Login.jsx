@@ -1,54 +1,34 @@
-// src/pages/Login.jsx
 import { useState } from 'react';
-import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [hint, setHint] = useState(() => {
-    // If they registered before, show a gentle hint of their email
-    const db = JSON.parse(localStorage.getItem('talanta_users') || '{}');
-    const first = Object.keys(db)[0];
-    return first ? `Did you register as “${first}”?` : '';
-  });
+  const [form, setForm] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
 
-  const submit = (e) => {
+  const handleChange = (e) => {
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const ok = login({ email, password });
-    if (!ok) return setError('Invalid email or password.');
+    const ok = await login(form);
+    if (!ok) return setError('Login failed. Check credentials.');
     navigate('/');
   };
 
   return (
-    <div className="container py-5" style={{ maxWidth: 420 }}>
-      <h2 className="mb-4">Login</h2>
-      {hint && <div className="alert alert-info py-2">{hint}</div>}
-      {error && <div className="alert alert-danger py-2">{error}</div>}
-
-      <form onSubmit={submit} className="vstack gap-3">
-        <input
-          className="form-control"
-          placeholder="Email"
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <input
-          className="form-control"
-          placeholder="Password"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-        <button className="btn btn-primary w-100">Log In</button>
+    <main className="min-h-screen flex items-center justify-center bg-green-100 px-4">
+      <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow-md w-full max-w-md">
+        <h2 className="text-xl font-bold mb-4">Log In</h2>
+        {error && <p className="text-red-600 mb-2">{error}</p>}
+        <input name="email" type="email" placeholder="Email" value={form.email} onChange={handleChange} required className="w-full p-2 mb-2 border" />
+        <input name="password" type="password" placeholder="Password" value={form.password} onChange={handleChange} required className="w-full p-2 mb-4 border" />
+        <button type="submit" className="w-full bg-green-600 text-white p-2 rounded">Log In</button>
       </form>
-    </div>
+    </main>
   );
 }
