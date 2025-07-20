@@ -179,7 +179,7 @@ export default function Opportunities() {
                 to="/opportunities/dashboard"
                 className="inline-block bg-indigo-600 text-white px-6 py-3 rounded font-semibold hover:bg-indigo-700"
               >
-                View My Submitted Opportunities →
+                View Submitted Opportunities →
               </Link>
             </div>
           </>

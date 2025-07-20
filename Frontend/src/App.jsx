@@ -7,7 +7,7 @@ import Signup from './pages/Signup';
 import Login from './pages/Login';
 import PrivateRoute from './components/PrivateRoute';
 import Opportunities from './pages/Opportunities';
-import PostOpportunity from './pages/Opportunities/PostForm';
+import PostForm from './pages/Opportunities/PostForm';
 import ManageDashboard from './pages/Opportunities/ManageDashboard';
 import { AuthProvider } from './contexts/AuthContext';
 import { TalentProvider } from './contexts/TalentContext';
@@ -44,7 +44,7 @@ export default function App() {
               path="/opportunities/post"
               element={
                 <PrivateRoute allowedRoles={['mentor', 'sponsor', 'organization']}>
-                  <PostOpportunity />
+                  <PostForm/>
                 </PrivateRoute>
               }
             />

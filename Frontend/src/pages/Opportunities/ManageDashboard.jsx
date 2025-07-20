@@ -1,18 +1,10 @@
-// src/pages/Opportunities/ManageDashboard.jsx
 import { useEffect } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
 import { useOpportunities } from '../../contexts/OpportunitiesContext';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 
 export default function ManageDashboard() {
-  const { user } = useAuth();
   const { opportunities } = useOpportunities();
-  const role = user?.role?.toLowerCase();
-
-  const myOpportunities = opportunities.filter(
-    (opp) => opp.postedBy === user?.name
-  );
 
   useEffect(() => {
     AOS.init({ duration: 700 });
@@ -22,19 +14,16 @@ export default function ManageDashboard() {
     <main className="min-h-screen px-4 py-10 bg-gradient-to-b from-green-600 to-emerald-700 text-white">
       <div className="max-w-5xl mx-auto">
         <h1 className="text-3xl font-bold mb-8 text-center" data-aos="fade-down">
-          My Submitted Opportunities
+          All Submitted Opportunities
         </h1>
 
-        {myOpportunities.length === 0 ? (
-          <p
-            className="text-center text-lg bg-yellow-100 text-yellow-800 p-4 rounded shadow"
-            data-aos="fade-right"
-          >
-            You haven’t posted any opportunities yet.
+        {opportunities.length === 0 ? (
+          <p className="text-center text-lg bg-yellow-100 text-yellow-800 p-4 rounded shadow" data-aos="fade-right">
+            No opportunities have been posted yet.
           </p>
         ) : (
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {myOpportunities.map((opp) => (
+            {opportunities.map((opp) => (
               <div
                 key={opp.id}
                 className="bg-white text-gray-800 rounded-lg shadow-md overflow-hidden"
@@ -54,10 +43,10 @@ export default function ManageDashboard() {
                     {opp.organization && (
                       <p><strong>Org:</strong> {opp.organization}</p>
                     )}
-                    <p><strong>Contact:</strong> {opp.contact}</p>
-                    <p>
-                      <strong>Posted By:</strong> {opp.postedBy} ({opp.role})
-                    </p>
+                    {opp.contact && (
+                      <p><strong>Contact:</strong> {opp.contact}</p>
+                    )}
+                    <p><strong>Posted By:</strong> {opp.postedBy || 'Unknown'}</p>
                   </div>
                 </div>
               </div>

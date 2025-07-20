@@ -4,7 +4,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useOpportunities } from '../../contexts/OpportunitiesContext';
 import { useNavigate } from 'react-router-dom';
 
-export default function PostOpportunity() {
+export default function PostForm() {
   const { user } = useAuth();
   const { addOpportunity } = useOpportunities();
   const navigate = useNavigate();
@@ -30,20 +30,23 @@ export default function PostOpportunity() {
     reader.readAsDataURL(file);
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+ const handleSubmit = (e) => {
+  e.preventDefault();
 
-    const opportunity = {
-      id: Date.now(),
-      ...formData,
-      role: user.role,
-      postedBy: user.name || user.username,
-    };
-
-    addOpportunity(opportunity);
-    alert('Opportunity submitted!');
-    navigate('/opportunities/dashboard');
+  const opportunity = {
+    id: Date.now(),
+    ...formData,
+    role: user.role,
+    postedBy: user.name || user.username || user.email,
+    userId: user.email, // 🔥 This line is critical
+    createdAt: new Date().toISOString(),
   };
+
+  addOpportunity(opportunity);
+  alert('Opportunity submitted!');
+  navigate('/opportunities/dashboard');
+};
+
 
   return (
     <section className="min-h-screen flex items-center justify-center bg-green-100 py-10 px-4">
