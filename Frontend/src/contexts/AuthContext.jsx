@@ -3,7 +3,6 @@ import { createContext, useContext, useState, useEffect } from 'react';
 
 const AuthContext = createContext();
 const LOCAL_USER_KEY = 'talanta_user';
-
 const BACKEND_URL = 'http://127.0.0.1:8000';
 
 export function AuthProvider({ children }) {
@@ -53,8 +52,14 @@ export function AuthProvider({ children }) {
 
       if (!res.ok) return false;
 
-      const data = await res.json(); // { token: '...', ... }
-      persistUser({ email, role: data.role, token: data.token });
+      const data = await res.json(); // { token, username, role }
+      persistUser({
+        username: data.username,
+        email,
+        role: data.role,
+        token: data.token,
+      });
+
       return true;
     } catch (err) {
       console.error('Login error:', err);

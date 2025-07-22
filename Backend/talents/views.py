@@ -7,7 +7,7 @@ class IsOwner(permissions.BasePermission):
         return obj.user == request.user
 
 class TalentViewSet(viewsets.ModelViewSet):
-    queryset = Talent.objects.all().order_by('-created_at')
+    queryset = Talent.objects.all()
     serializer_class = TalentSerializer
 
     def get_permissions(self):

@@ -1,27 +1,76 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 
-/* ------------------------------------------------------------------ */
-/*  TalentContext – provides global talent list + helper to add       */
-/* ------------------------------------------------------------------ */
 const TalentContext = createContext();
 
 export function TalentProvider({ children }) {
-  /* ---------- 1. 100 % EMPTY at start -------------- */
   const [talents, setTalents] = useState([]);
 
-  /* ---------- 2. OPTIONAL localStorage persistence-- */
+  // 🔐 Get token from localStorage
+  const getToken = () => {
+    const userObj = JSON.parse(localStorage.getItem('talanta_user'));
+    return userObj?.token;
+  };
+
+
+  // 🔄 Load all talents on mount
   useEffect(() => {
-    const saved = JSON.parse(localStorage.getItem('talantahub_talents') || '[]');
-    if (saved.length) setTalents(saved);
+    const token = getToken();
+    if (!token) {
+      console.warn('No token found. Please log in.');
+      return;
+    }
+
+    fetch('http://127.0.0.1:8000/api/talents/', {
+      headers: {
+        'Authorization': `Token ${token}`,
+      },
+    })
+      .then(res => {
+        if (!res.ok) {
+          throw new Error('Failed to fetch talents');
+        }
+        return res.json();
+      })
+      .then(data => {
+        if (Array.isArray(data)) {
+          setTalents(data);
+        } else {
+          console.error("Talents fetch did not return an array:", data);
+        }
+      })
+      .catch(err => console.error("Failed to load talents:", err));
   }, []);
 
-  useEffect(() => {
-    localStorage.setItem('talantahub_talents', JSON.stringify(talents));
-  }, [talents]);
+  // ➕ Upload new talent
+  const addTalent = async (talentObj) => {
+    const token = getToken();
+    if (!token) {
+      console.error("No token found. Please log in.");
+      return;
+    }
 
-  /* ---------- 3. helper to add new talent ---------- */
-  const addTalent = (talentObj) =>
-    setTalents((prev) => [{ id: Date.now(), ...talentObj }, ...prev]);
+    try {
+      const response = await fetch('http://127.0.0.1:8000/api/talents/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Token ${token}`,
+        },
+        body: JSON.stringify(talentObj),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Error response from backend:", errorData);
+        throw new Error("Failed to add talent");
+      }
+
+      const newTalent = await response.json();
+      setTalents((prev) => [newTalent, ...prev]);
+    } catch (err) {
+      console.error("Failed to add talent:", err);
+    }
+  };
 
   return (
     <TalentContext.Provider value={{ talents, addTalent }}>

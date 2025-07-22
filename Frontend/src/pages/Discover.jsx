@@ -4,10 +4,11 @@ import AOS from 'aos';
 import 'aos/dist/aos.css';
 
 export default function Discover() {
-  /* ─────────── get talent list ─────────── */
-  const { talents = [] } = useTalent() || {};   // <= default to [] in case context undefined
+  // Pull talent list from context and default to empty array
+  const context = useTalent();
+  const talents = Array.isArray(context?.talents) ? context.talents : [];
 
-  /* ─────────── AOS once ─────────── */
+  // Animate on scroll setup
   useEffect(() => {
     AOS.init({ duration: 900, easing: 'ease-out-cubic' });
   }, []);
@@ -67,7 +68,6 @@ export default function Discover() {
                     className="inline-flex items-center gap-1 text-indigo-600 text-sm font-semibold hover:underline"
                   >
                     View Showcase
-                    {/* arrow icon */}
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       viewBox="0 0 24 24"
