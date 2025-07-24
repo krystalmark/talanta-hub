@@ -3,6 +3,7 @@ import { createContext, useContext, useState, useEffect } from 'react';
 
 const AuthContext = createContext();
 const LOCAL_USER_KEY = 'talanta_user';
+const TOKEN_KEY = 'authToken';
 const BACKEND_URL = 'http://127.0.0.1:8000';
 
 export function AuthProvider({ children }) {
@@ -11,7 +12,9 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     const saved = JSON.parse(localStorage.getItem(LOCAL_USER_KEY));
-    if (saved) {
+    const savedToken = localStorage.getItem(TOKEN_KEY);
+
+    if (saved && savedToken) {
       setUser(saved);
       setRole(saved.role);
     }
@@ -19,6 +22,7 @@ export function AuthProvider({ children }) {
 
   const persistUser = (userObj) => {
     localStorage.setItem(LOCAL_USER_KEY, JSON.stringify(userObj));
+    localStorage.setItem(TOKEN_KEY, userObj.token); // ✅ Save token separately
     setUser(userObj);
     setRole(userObj.role);
   };
@@ -69,6 +73,7 @@ export function AuthProvider({ children }) {
 
   const logout = () => {
     localStorage.removeItem(LOCAL_USER_KEY);
+    localStorage.removeItem(TOKEN_KEY); // ✅ clear authToken too
     setUser(null);
     setRole(null);
   };

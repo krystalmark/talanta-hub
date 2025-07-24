@@ -173,10 +173,10 @@ export default function Home() {
   <div className="flex flex-col items-center gap-2">
     <span className="text-lg text-gray-700 font-medium">Email us</span>
     <a
-      href="mailto:hello@talantahub.com"
+      href="mailto:hubtalanta@gmail.com"
       className="inline-block bg-indigo-600 text-white px-6 py-3 rounded-full hover:bg-indigo-700 transition"
     >
-      hello@talantahub.com
+      hubtalanta@gmail.com
     </a>
   </div>
 </section>
