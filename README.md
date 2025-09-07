@@ -29,7 +29,7 @@ Empowering Youth. Connecting Talent. Creating Opportunities.
 
 - *Frontend:* React.js , Tailwind CSS  
 - *Backend:* Python - Django 
-- *Database:* Sqlite  
+- *Database:* Postgresql  
 - *Authentication:*  OAuth 
 - *Hosting:*  Render   
 - *Others:* RESTful APIs
@@ -40,7 +40,7 @@ Empowering Youth. Connecting Talent. Creating Opportunities.
 
 ### Prerequisites
 - Django
-- Sqlite
+- Postgresql 
 - Git
 
 ### Clone the Repo
