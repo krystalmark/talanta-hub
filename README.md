@@ -48,3 +48,7 @@ Empowering Youth. Connecting Talent. Creating Opportunities.
 ```bash
 git clone https://github.com/krystalmark/talanta-hub.git
 cd talanta-hub
+
+open two different terminals:
+cd Fronted -> npm run dev
+cd Backend -> python3 manage.py runserver
